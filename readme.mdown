@@ -1,0 +1,41 @@
+## Integrate into your app
+
+### Install
+
+```bash
+npm install --save https://github.com/dcsaszar/scrivito-sam.git
+```
+
+### Webpack integration
+
+Adjust the `webpack.config.js`:
+
+```js
+  // ...
+  include: [
+    path.join(__dirname, "src"),
+    path.join(__dirname, "node_modules/scrivito-sam/src"),
+  ],
+  // ...
+```
+
+### Add the extension
+
+Add to `src/Objs/_metadataEditingConfig.js`:
+
+```js
+import { assistPopertiesGroup } from "scrivito-sam";
+
+// ...
+
+export const metadataPropertiesGroups = [
+  // ...
+  assistPopertiesGroup,
+];
+```
+
+## Update
+
+```bash
+npm uninstall scrivito-sam && npm install --save https://github.com/dcsaszar/scrivito-sam.git
+```
