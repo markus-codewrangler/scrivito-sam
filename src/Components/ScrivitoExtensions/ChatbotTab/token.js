@@ -1,5 +1,10 @@
-export async function refreshShortTermToken() {
-  const tenantId =
+import * as Scrivito from "scrivito";
+
+let token;
+
+export async function refreshToken() {
+  // @ts-ignore
+  window.tenantId =
     // @ts-ignore
     typeof import.meta.env === "undefined"
       ? // @ts-ignore
@@ -7,19 +12,14 @@ export async function refreshShortTermToken() {
       : // @ts-ignore
         import.meta.env.SCRIVITO_TENANT;
 
-  const auth = await (
-    await fetch(
-      `https://jr-api.scrivito.com/iam/${tenantId}/short_term_token?origin=${encodeURIComponent(
-        "https://edit.scrivito.com"
-      )}`,
-      { credentials: "include" }
-    )
-  ).json();
-
-  const token = auth.access_token;
-
-  // @ts-ignore
-  window.access_token = token;
+  token = await Scrivito.load(() =>
+    // @ts-ignore
+    Scrivito.currentEditor()?.authToken()
+  );
 
   return !!token;
+}
+
+export function getToken() {
+  return token;
 }

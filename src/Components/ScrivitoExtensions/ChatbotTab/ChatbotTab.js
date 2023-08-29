@@ -4,7 +4,7 @@ import { useChatCompletion } from "openai-streaming-hooks-chrome-fix";
 import TextareaAutosize from "react-textarea-autosize";
 import { sortBy, throttle } from "lodash-es";
 import { languages } from "./languages.js";
-import { refreshShortTermToken } from "./token.js";
+import { getToken, refreshToken } from "./token.js";
 
 import "./ChatbotTab.scss";
 
@@ -32,7 +32,7 @@ const Assist = Scrivito.connect(function ({ obj, editor, locale }) {
   const [autoSubmit, setAutoSubmit] = React.useState(false);
 
   React.useEffect(() => {
-    refreshShortTermToken().then(setHasToken);
+    refreshToken().then(setHasToken);
   }, []);
 
   const {
@@ -45,7 +45,8 @@ const Assist = Scrivito.connect(function ({ obj, editor, locale }) {
   } = useChatCompletion({
     // @ts-ignore
     model: "gpt-3.5-turbo-0613",
-    apiKey: "",
+    // @ts-ignore
+    apiKey: getToken,
     user: editor.id(),
   });
 
@@ -75,7 +76,7 @@ const Assist = Scrivito.connect(function ({ obj, editor, locale }) {
       });
     }
     submit.push({ content: prompt, role: "user" });
-    setHasToken(await refreshShortTermToken());
+    setHasToken(await refreshToken());
     // @ts-ignore
     submitPrompt(submit);
     setPrompt("");
@@ -98,20 +99,9 @@ const Assist = Scrivito.connect(function ({ obj, editor, locale }) {
   }, [messages, autoSubmit, onSend]);
 
   const isDisabled =
+    !hasToken ||
     loading ||
     (messages.length > 0 && messages[messages.length - 1].meta.loading);
-
-  if (!hasToken) {
-    return (
-      <div className="chat-wrapper">
-        Unexpected authorization state. Please{" "}
-        <a href="https://my.scrivito.com" target="_top">
-          confirm your account
-        </a>{" "}
-        to use the assistant.
-      </div>
-    );
-  }
 
   return (
     <>
