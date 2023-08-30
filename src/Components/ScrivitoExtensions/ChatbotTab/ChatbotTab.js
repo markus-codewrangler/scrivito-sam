@@ -1,12 +1,18 @@
+import "./ChatbotTab.scss";
+
 import * as React from "react";
 import * as Scrivito from "scrivito";
+
 import { useChatCompletion } from "openai-streaming-hooks-chrome-fix";
 import TextareaAutosize from "react-textarea-autosize";
-import { sortBy, throttle } from "lodash-es";
+import { throttle } from "lodash-es";
+
 import { languages } from "./languages.js";
 import { getToken, refreshToken } from "./token.js";
-
-import "./ChatbotTab.scss";
+import { widgetlistAttributeNames } from "./widgetlistAttributeNames.js";
+import { flatWidgets } from "./flatWidgets.js";
+import { extractHtml } from "./extractHtml.js";
+import { parseHtml } from "./parseHtml.js";
 
 export function ChatbotTab({ obj }) {
   const uiContext = Scrivito.uiContext();
@@ -53,7 +59,7 @@ const Assist = Scrivito.connect(function ({ obj, editor, locale }) {
   React.useEffect(scrollToEnd, [messages]);
   const language = languages[locale];
   const onSend = React.useCallback(async () => {
-    const html = await widgetsToHtml(obj);
+    const html = await extractHtml(obj);
     console.log(html);
 
     if (!prompt) return;
@@ -224,7 +230,7 @@ const Content = React.memo(({ content, obj, loading }) => {
   const parts = preprocessedContent.split(SPLIT);
   return parts.map((part, i) => {
     const isHtml = part.includes("<widget ");
-    const widgetsDescription = isHtml ? parseHtmlToWidgets(part) : undefined;
+    const widgetsDescription = isHtml ? parseHtml(part) : undefined;
     return (
       <section className={isHtml ? "html" : "text"} key={i}>
         {isHtml ? (
@@ -263,7 +269,7 @@ const AcceptButton = Scrivito.connect(function AcceptButton({
 
 function toScrivitoWidgets(widgetsDescription, obj) {
   if (!widgetsDescription) return undefined;
-  const prevWidgets = getWidgets(obj);
+  const prevWidgets = flatWidgets(obj);
   const usedIds = [];
   const newWidgets = widgetsDescription.map(
     ({ id, objClass, ...attributes }) => {
@@ -292,7 +298,7 @@ function toScrivitoWidgets(widgetsDescription, obj) {
 
 async function save(obj, widgetsDescription) {
   const scrivitoWidgets = toScrivitoWidgets(widgetsDescription, obj);
-  const prevWidgets = getWidgets(obj);
+  const prevWidgets = flatWidgets(obj);
 
   const isUpdateOnly =
     scrivitoWidgets
@@ -311,6 +317,7 @@ async function save(obj, widgetsDescription) {
     containers.forEach((c) =>
       widgetlistAttributeNames(c).forEach((name) => c.update({ [name]: [] }))
     );
+
     container.update({ [attributeName]: newWidgets });
   }
 
@@ -318,78 +325,4 @@ async function save(obj, widgetsDescription) {
     widget.update(attributes)
   );
   await obj.finishSaving();
-}
-
-function parseHtmlToWidgets(html) {
-  const parts = html.split(/<widget|<\/widget>/).filter((p) => p.trim() !== "");
-  const widgetsDescription = parts.map(partToWidget);
-
-  return widgetsDescription;
-}
-
-function partToWidget(part) {
-  const html = part.replace(/^[^<]*>/, "");
-  let type = "TextWidget";
-  let id = null;
-
-  const hasWidgetData = html !== part;
-  if (hasWidgetData) {
-    const attributes = part.split(">")[0];
-    const idMatch = attributes.match(/id="([a-f0-9]{8})"/);
-    if (idMatch) [, id] = idMatch;
-    const typeMatch = attributes.match(/type="([A-Z][a-zA-Z]*Widget)"/);
-    if (typeMatch && Scrivito.getClass(typeMatch[1]) !== null) {
-      [, type] = typeMatch;
-    }
-  }
-
-  const result = { objClass: type, id };
-
-  if (type === "HeadlineWidget") {
-    const styleMatch = html.match(/^<(h.)/);
-    result.style = styleMatch ? styleMatch[1] : "h2";
-    result.headline = html.replace(/^\s*<h.>|<\/h.>\s*$/g, "");
-  }
-
-  if (type === "TextWidget") {
-    result.text = html.replace(/(<\/)?script/g, "$1pre");
-  }
-
-  return result;
-}
-
-async function widgetsToHtml(obj) {
-  const widgets = await Scrivito.load(() => getWidgets(obj));
-  const html = widgets
-    .map((w) => {
-      const id = w.id();
-      const widgetClass = w.objClass();
-      const inner = w.get("headline") || w.get("text") || "";
-      const tag = widgetClass === "HeadlineWidget" ? w.get("style") : "";
-      return `<widget type="${widgetClass}" id="${id}">${
-        tag ? `<${tag}>` : ""
-      }${inner}${tag ? `</${tag}>` : ""}</widget>`;
-    })
-    .join("\n");
-  return `<html>\n${html}\n</html>`;
-}
-
-function getWidgets(content) {
-  return widgetlistAttributeNames(content).flatMap((attributeName) =>
-    content
-      .get(attributeName)
-      .flatMap((widget) =>
-        widgetlistAttributeNames(widget).length ? getWidgets(widget) : widget
-      )
-  );
-}
-
-function widgetlistAttributeNames(content) {
-  const attributes = content.attributeDefinitions();
-  return sortBy(
-    Object.keys(attributes).filter(
-      (name) => attributes[name][0] === "widgetlist"
-    ),
-    (name) => name.replace("nav", "0")
-  );
 }
