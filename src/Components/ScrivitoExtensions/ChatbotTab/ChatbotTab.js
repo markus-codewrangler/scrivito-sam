@@ -308,16 +308,23 @@ async function save(obj, widgetsDescription) {
       .join() === prevWidgets.map((widget) => widget.id()).join();
 
   if (!isUpdateOnly) {
-    let container = obj;
-    if (prevWidgets.length) container = prevWidgets[0].container();
+    const firstPrevWidget = prevWidgets[0];
+    const container = firstPrevWidget?.container() || obj;
+    const preferredAttributeName = firstPrevWidget
+      ? containerAttributeName(firstPrevWidget)
+      : "body";
+    const attributeName =
+      widgetlistAttributeNames(container).find(
+        (name) => name === preferredAttributeName
+      ) || widgetlistAttributeNames(container)[0];
     const newWidgets = scrivitoWidgets.map(({ widget }) => widget);
-    const attributeName = widgetlistAttributeNames(container)[0];
 
-    const containers = prevWidgets.map((widget) => widget.container());
-    containers.forEach((c) =>
-      widgetlistAttributeNames(c).forEach((name) => c.update({ [name]: [] }))
+    prevWidgets.forEach((w) =>
+      widgetlistAttributeNames(w.container()).forEach((name) => {
+        if (w.container().id() !== container.id())
+          w.container().update({ [name]: [] });
+      })
     );
-
     container.update({ [attributeName]: newWidgets });
   }
 
@@ -325,4 +332,11 @@ async function save(obj, widgetsDescription) {
     widget.update(attributes)
   );
   await obj.finishSaving();
+}
+
+function containerAttributeName(widget) {
+  const container = widget.container();
+  return widgetlistAttributeNames(container).find((name) =>
+    container.get(name).some((w) => w.id() === widget.id())
+  );
 }
