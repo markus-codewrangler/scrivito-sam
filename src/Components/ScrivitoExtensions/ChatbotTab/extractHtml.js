@@ -8,7 +8,7 @@ export async function extractHtml(obj) {
       const id = w.id();
       const widgetClass = w.objClass();
       const inner = w.get("headline") || w.get("text") || "";
-      const tag = widgetClass === "HeadlineWidget" ? w.get("style") : "";
+      const tag = widgetClass.startsWith("Headline") ? w.get("style") : "";
       return `<widget type="${widgetClass}" id="${id}">${
         tag ? `<${tag}>` : ""
       }${inner}${tag ? `</${tag}>` : ""}</widget>`;

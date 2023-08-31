@@ -25,13 +25,13 @@ function partToWidget(part) {
 
   const result = { objClass: type, id };
 
-  if (type === "HeadlineWidget") {
+  if (type.startsWith("Headline")) {
     const styleMatch = html.match(/^<(h.)/);
     result.style = styleMatch ? styleMatch[1] : "h2";
     result.headline = html.replace(/^\s*<h.>|<\/h.>\s*$/g, "");
   }
 
-  if (type === "TextWidget") {
+  if (type.startsWith("Text")) {
     result.text = html.replace(/(<\/)?script/g, "$1pre");
   }
 
