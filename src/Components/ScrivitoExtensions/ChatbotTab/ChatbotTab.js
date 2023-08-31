@@ -14,6 +14,8 @@ import { flatWidgets } from "./flatWidgets.js";
 import { extractHtml } from "./extractHtml.js";
 import { parseHtml } from "./parseHtml.js";
 
+const model = "gpt-3.5-turbo-16k-0613";
+
 export function ChatbotTab({ obj }) {
   const uiContext = Scrivito.uiContext();
   const editor = Scrivito.currentEditor();
@@ -50,7 +52,7 @@ const Assist = Scrivito.connect(function ({ obj, editor, locale }) {
     setMessages,
   } = useChatCompletion({
     // @ts-ignore
-    model: "gpt-3.5-turbo-0613",
+    model,
     // @ts-ignore
     apiKey: getToken,
     user: editor.id(),
