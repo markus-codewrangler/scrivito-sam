@@ -26,9 +26,9 @@ function partToWidget(part) {
   const result = { objClass: type, id };
 
   if (type.startsWith("Headline")) {
-    const styleMatch = html.match(/^<(h.)/);
-    result.style = styleMatch ? styleMatch[1] : "h2";
-    result.headline = html.replace(/^\s*<h.>|<\/h.>\s*$/g, "");
+    const styleMatch = html.match(/^<(\w+)/);
+    result.style = styleMatch ? styleMatch[1] : null;
+    result.headline = html.replace(/^\s*<\w+>|<\/\w+>\s*$/g, "");
   }
 
   if (type.startsWith("Text")) {
