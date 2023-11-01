@@ -282,7 +282,12 @@ function toScrivitoWidgets(widgetsDescription, obj) {
         !usedIds.includes(id)
       ) {
         usedIds.push(id);
-        return { widget: existingWidget, attributes, modification: "edit" };
+        return {
+          widget: existingWidget,
+          attributes,
+          modification: "edit",
+          widgetId: id,
+        };
       }
       const WidgetClass = Scrivito.getClass(objClass);
       if (!WidgetClass) return null;
@@ -302,12 +307,30 @@ async function save(obj, widgetsDescription) {
   const scrivitoWidgets = toScrivitoWidgets(widgetsDescription, obj);
   const prevWidgets = flatWidgets(obj);
 
-  const isUpdateOnly =
-    scrivitoWidgets
-      .map(({ modification, widget }) =>
-        modification === "update" ? widget.id() : modification
-      )
-      .join() === prevWidgets.map((widget) => widget.id()).join();
+  const widgetIds = scrivitoWidgets
+    .map(({ modification, widget, widgetId }) =>
+      modification === "edit" ? widgetId : null
+    )
+    .filter((w) => !!w);
+  const prevWidgetIds = prevWidgets.map((widget) => widget.id());
+  const editWidgetIds = prevWidgetIds.filter((id) => widgetIds.includes(id));
+  const editWidgets = scrivitoWidgets.filter(({ widgetId }) =>
+    editWidgetIds.includes(widgetId)
+  );
+
+  editWidgets.forEach(({ widget, attributes }) => {
+    const widgetToUpdate = obj.widgets().find((w) => w.id() === widget.id());
+
+    Object.entries(attributes).forEach(([key, value]) => {
+      try {
+        widgetToUpdate.update({ [key]: value });
+      } catch (e) {
+        console.error(e);
+      }
+    });
+  });
+
+  const isUpdateOnly = widgetIds.join() === prevWidgetIds.join();
 
   if (!isUpdateOnly) {
     const firstPrevWidget = prevWidgets[0];
