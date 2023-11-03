@@ -122,7 +122,7 @@ const Assist = Scrivito.connect(function ({ obj, editor, locale }) {
               <div className="message-wrapper" key={i}>
                 {msg.role === "assistant" && (
                   <button
-                    className="btn btn-primary refresh"
+                    className="btn refresh"
                     onClick={() => {
                       setMessages(messages.slice(0, i - 1));
                       setPrompt(messages[i - 1].content);
@@ -171,11 +171,7 @@ const Assist = Scrivito.connect(function ({ obj, editor, locale }) {
             }}
             disabled={isDisabled}
           />
-          <button
-            className="btn btn-primary send"
-            onClick={onSend}
-            title={language.send}
-          >
+          <button className="btn send" onClick={onSend} title={language.send}>
             <i
               className={isDisabled ? "icon fa-hourglass" : "icon fa-send"}
             ></i>
@@ -261,7 +257,7 @@ const AcceptButton = Scrivito.connect(function AcceptButton({
   return (
     <button
       title="Übernehmen"
-      className="btn btn-primary accept"
+      className="btn accept"
       onClick={() => save(obj, widgetsDescription)}
     >
       <i className="icon fa-check"></i>
