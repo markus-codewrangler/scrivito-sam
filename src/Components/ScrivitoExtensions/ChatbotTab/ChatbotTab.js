@@ -24,7 +24,7 @@ export function ChatbotTab({ obj }) {
 
   return (
     <div className={`scrivito_${uiContext.theme}`}>
-      <div className="scrivito_detail_content">
+      <div className="assist-wrapper">
         <Assist obj={obj} editor={editor} locale={locale} />
       </div>
       <div id="bottom"></div>
