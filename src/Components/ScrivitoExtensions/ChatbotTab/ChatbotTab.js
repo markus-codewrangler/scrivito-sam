@@ -306,9 +306,7 @@ async function save(obj, widgetsDescription) {
   const prevWidgets = flatWidgets(obj);
 
   const widgetIds = scrivitoWidgets
-    .map(({ modification, widget, widgetId }) =>
-      modification === "edit" ? widgetId : null
-    )
+    .map(({ widgetId }) => widgetId)
     .filter((w) => !!w);
   const prevWidgetIds = prevWidgets.map((widget) => widget.id());
   const editWidgetIds = prevWidgetIds.filter((id) => widgetIds.includes(id));
@@ -328,7 +326,11 @@ async function save(obj, widgetsDescription) {
     });
   });
 
-  const isUpdateOnly = widgetIds.join() === prevWidgetIds.join();
+  const hasNewWidgets = scrivitoWidgets.some(
+    ({ modification }) => modification === "new"
+  );
+  const isUpdateOnly =
+    !hasNewWidgets && widgetIds.join() === prevWidgetIds.join();
 
   if (!isUpdateOnly) {
     const firstPrevWidget = prevWidgets[0];
