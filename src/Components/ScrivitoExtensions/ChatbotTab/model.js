@@ -1,5 +1,5 @@
 export function getModel() {
-  const fallback = "gpt-4-1106-preview";
+  const fallback = "gpt-4-turbo-preview";
   try {
     return localStorage.getItem("openai_model") || fallback;
   } catch {
