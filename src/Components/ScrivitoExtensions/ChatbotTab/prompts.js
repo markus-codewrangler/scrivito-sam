@@ -11,6 +11,8 @@ export const prompts = {
 * Widgets are child elements of <html>.
 * Each widget is represented by <widget type="...">.
 * Widget types type="HeadlineWidget", type="TextWidget", type="ImageWidget".
+* Other widget types are:
+<WIDGETSTYPES>
 * Each <widget type="HeadlineWidget"> contains a single <h1>...<h6> tag.
 * Each headline (<h1>...<h6>) is repressented by a headline widget <widget type="HeadlineWidget">.
 * An image is represented by an empty <widget type="ImageWidget">.

@@ -15,6 +15,7 @@ import { extractHtml } from "./extractHtml.js";
 import { parseHtml } from "./parseHtml.js";
 import { getModel } from "./model.js";
 import { prompts } from "./prompts.js";
+import { getWidgetsPrompt } from "./getWidgetsPrompt.js";
 
 export function ChatbotTab({ obj }) {
   const uiContext = Scrivito.uiContext();
@@ -64,6 +65,7 @@ const Assist = Scrivito.connect(function ({ obj, editor, locale }) {
 
   const language = languages[locale] || languages["en"];
   const onSend = React.useCallback(async () => {
+    const widgetsPrompt = await getWidgetsPrompt(obj);
     const html = await extractHtml(obj);
     console.log(html);
 
@@ -77,6 +79,7 @@ const Assist = Scrivito.connect(function ({ obj, editor, locale }) {
           .replace("<LANGUAGE>", language.language)
           .replace("<USERNAME>", editor.name() || "???")
           .replace("<USEREMAIL>", editor.email() || "???")
+          .replace("<WIDGETSTYPES>", widgetsPrompt)
           .replace("<WIDGETHTML>", html),
         role: "system",
       });
