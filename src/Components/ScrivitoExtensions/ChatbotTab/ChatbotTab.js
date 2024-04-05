@@ -14,6 +14,7 @@ import { flatWidgets } from "./flatWidgets.js";
 import { extractHtml } from "./extractHtml.js";
 import { parseHtml } from "./parseHtml.js";
 import { getModel } from "./model.js";
+import { prompts } from "./prompts.js";
 
 export function ChatbotTab({ obj }) {
   const uiContext = Scrivito.uiContext();
@@ -72,7 +73,8 @@ const Assist = Scrivito.connect(function ({ obj, editor, locale }) {
     if (messages.length === 0) {
       setSystemHtml(html);
       submit.push({
-        content: language.systemPrompt
+        content: prompts.systemPrompt
+          .replace("<LANGUAGE>", language.language)
           .replace("<USERNAME>", editor.name() || "???")
           .replace("<USEREMAIL>", editor.email() || "???")
           .replace("<WIDGETHTML>", html),
@@ -81,7 +83,7 @@ const Assist = Scrivito.connect(function ({ obj, editor, locale }) {
     } else if (systemHtml !== html) {
       setSystemHtml(html);
       submit.push({
-        content: language.systemUpdatePrompt.replace("<WIDGETHTML>", html),
+        content: prompts.systemUpdatePrompt.replace("<WIDGETHTML>", html),
         role: "system",
       });
     }
@@ -92,8 +94,8 @@ const Assist = Scrivito.connect(function ({ obj, editor, locale }) {
     setPrompt("");
   }, [
     editor,
-    language.systemPrompt,
-    language.systemUpdatePrompt,
+    prompts.systemPrompt,
+    prompts.systemUpdatePrompt,
     messages.length,
     obj,
     prompt,
