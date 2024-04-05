@@ -18,7 +18,6 @@ export const prompts = {
 * Each <widget type="TextWidget"> contains valid HTML4 tags.
 * Widgets keep their "id" attribute.
 * HTML starts with <html> and ends with </html> and is enclosed in markdown.
-* To highlight parts of the text, you insert <mark>...</mark> tags.
 
 The following HTML is the current input:
 
