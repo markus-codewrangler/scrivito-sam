@@ -15,4 +15,12 @@ export const languages = {
     reset: "New chat",
     send: "Send",
   },
+  fr: {
+    abortResponse: "Arrêter",
+    language: "French",
+    placeholder: "Votre message",
+    refresh: "Une autre réponse",
+    reset: "Nouveau chat",
+    send: "Envoyer",
+  },
 };
