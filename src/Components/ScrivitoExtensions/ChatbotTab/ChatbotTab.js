@@ -61,7 +61,7 @@ const Assist = Scrivito.connect(function ({ obj, editor, locale }) {
     if (messages.length > 0) scrollToEnd();
   }, [messages]);
 
-  const language = languages[locale];
+  const language = languages[locale] || languages["en"];
   const onSend = React.useCallback(async () => {
     const html = await extractHtml(obj);
     console.log(html);
