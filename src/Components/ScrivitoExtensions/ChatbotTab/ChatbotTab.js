@@ -325,7 +325,12 @@ async function save(obj, widgetsDescription) {
 
     Object.entries(attributes).forEach(([key, value]) => {
       try {
-        widgetToUpdate.update({ [key]: value });
+        if (key.endsWith("-title")) {
+          const name = key.replace("-title", "");
+          delete attributes[key];
+          attributes[name] =
+            widgetToUpdate.get(name)?.copy({ title: value }) || null;
+        } else widgetToUpdate.update({ [key]: value });
       } catch (e) {
         console.error(e);
       }
