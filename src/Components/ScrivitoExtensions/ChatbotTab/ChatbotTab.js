@@ -214,7 +214,8 @@ const scrollToEnd = throttle(() => {
   document.getElementById("bottom")?.scrollIntoView({ behavior: "smooth" });
 }, 250);
 
-const SPLIT = /<\/html>\s*```|```html\n<html>|<\/html>|<html>|```[a-z]*/;
+const SPLIT =
+  /<\/html>\s*```|```html\n<html[^<>]*>?|<\/html>|<html[^<>]*>?|```[a-z]*/;
 
 // @ts-ignore
 const Content = React.memo(({ content, obj, loading }) => {
