@@ -349,12 +349,18 @@ async function save(obj, widgetsDescription) {
       ) || widgetlistAttributeNames(container)[0];
     const newWidgets = scrivitoWidgets.map(({ widget }) => widget);
 
-    prevWidgets.forEach((w) =>
-      widgetlistAttributeNames(w.container()).forEach((name) => {
-        if (w.container().id() !== container.id())
-          w.container().update({ [name]: [] });
-      })
-    );
+    prevWidgets.forEach((prevWidget) => {
+      const clearContainer = prevWidget.container();
+      widgetlistAttributeNames(clearContainer).forEach((name) => {
+        clearContainer.update({
+          [name]: clearContainer
+            .get(name)
+            .filter((widget) =>
+              widget.widgets().some((w) => w.id() === container.id())
+            ),
+        });
+      });
+    });
     container.update({ [attributeName]: newWidgets });
   }
 
