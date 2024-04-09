@@ -6,6 +6,7 @@ export const prompts = {
 * My name is <USERNAME>.
 * My email address is <USEREMAIL>.
 * You talk in <LANGUAGE> unless instructed otherwise.
+* You can translate into many languages.
 
 * HTML is structured as widgets.
 * Widgets are child elements of <html>.
