@@ -1,6 +1,6 @@
 import * as Scrivito from "scrivito";
 
-import { flatWidgets } from "./flatWidgets";
+import { flatWidgets } from "./flatWidgets.js";
 import { widgetlistAttributeNames } from "./widgetlistAttributeNames.js";
 import { getPrimaryAttributeName } from "./getPrimaryAttributeName.js";
 
