@@ -297,7 +297,7 @@ function toScrivitoWidgets(widgetsDescription, obj) {
       if (!WidgetClass) return null;
       return {
         // @ts-ignore
-        widget: new WidgetClass(attributes),
+        widget: new WidgetClass({}),
         attributes,
         modification: "new",
       };
@@ -322,19 +322,7 @@ async function save(obj, widgetsDescription) {
 
   editWidgets.forEach(({ widget, attributes }) => {
     const widgetToUpdate = obj.widgets().find((w) => w.id() === widget.id());
-
-    Object.entries(attributes).forEach(([key, value]) => {
-      try {
-        if (key.endsWith("-title")) {
-          const name = key.replace("-title", "");
-          delete attributes[key];
-          attributes[name] =
-            widgetToUpdate.get(name)?.copy({ title: value }) || null;
-        } else widgetToUpdate.update({ [key]: value });
-      } catch (e) {
-        console.error(e);
-      }
-    });
+    updateAttributes(widgetToUpdate, attributes);
   });
 
   const hasNewWidgets = scrivitoWidgets.some(
@@ -371,7 +359,7 @@ async function save(obj, widgetsDescription) {
   }
 
   scrivitoWidgets.forEach(({ widget, attributes }) =>
-    widget.update(attributes)
+    updateAttributes(widget, attributes)
   );
   await obj.finishSaving();
 }
@@ -381,4 +369,36 @@ function containerAttributeName(widget) {
   return widgetlistAttributeNames(container).find((name) =>
     container.get(name).some((w) => w.id() === widget.id())
   );
+}
+
+function updateAttributes(content, attributes) {
+  Object.entries(attributes).forEach(([key, value]) => {
+    try {
+      const name = key.replace("-title", "");
+      const definition = content.attributeDefinitions()[name];
+      if (!definition) {
+        throw new Error(`Unknown attribute ${content.objClass()}#${key}`);
+      }
+      const [attributeType] = definition;
+      switch (attributeType) {
+        case "link":
+          content.update({
+            [name]: (content.get(name) || new Scrivito.Link({ url: "/" })).copy(
+              {
+                title: value,
+              }
+            ),
+          });
+          break;
+        case "float":
+        case "integer":
+          content.update({ [name]: Number(value) });
+          break;
+        default:
+          content.update({ [name]: value });
+      }
+    } catch (e) {
+      console.error(e);
+    }
+  });
 }

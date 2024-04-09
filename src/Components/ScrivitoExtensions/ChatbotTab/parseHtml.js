@@ -24,11 +24,10 @@ function partToWidget(part) {
       const [, type] = typeMatch;
       result.objClass = type;
     }
-    const linkTitleMatch = attributes.match(/data-(\w+-title)="([^"]*)"/);
-    if (linkTitleMatch) {
-      const [, key, value] = linkTitleMatch;
+    attributes.match(/data-[\w-]+="[^"]*"/g).forEach((a) => {
+      const [, key, value] = a.match(/data-([\w-]+)="([^"]*)"/);
       result[key] = value;
-    }
+    });
   }
 
   if (result.objClass.startsWith("Headline")) {
