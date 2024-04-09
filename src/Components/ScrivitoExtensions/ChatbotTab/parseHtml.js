@@ -24,7 +24,7 @@ function partToWidget(part) {
       const [, type] = typeMatch;
       result.objClass = type;
     }
-    attributes.match(/data-[\w-]+="[^"]*"/g).forEach((a) => {
+    attributes.match(/data-[\w-]+="[^"]*"/g)?.forEach((a) => {
       const [, key, value] = a.match(/data-([\w-]+)="([^"]*)"/);
       result[key] = value;
     });
