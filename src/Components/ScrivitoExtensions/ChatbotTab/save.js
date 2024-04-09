@@ -81,6 +81,9 @@ function updateAttributes(content, attributes) {
       }
       const [attributeType] = definition;
       switch (attributeType) {
+        case "enum":
+          content.update({ [name]: value || null });
+          break;
         case "link":
           content.update({
             [name]: (content.get(name) || new Scrivito.Link({ url: "/" })).copy(
@@ -93,6 +96,10 @@ function updateAttributes(content, attributes) {
         case "float":
         case "integer":
           content.update({ [name]: Number(value) });
+          break;
+        case "multienum":
+        case "stringlist":
+          content.update({ [name]: value.split(/,? /).filter((v) => !!v) });
           break;
         default:
           content.update({ [name]: value });
