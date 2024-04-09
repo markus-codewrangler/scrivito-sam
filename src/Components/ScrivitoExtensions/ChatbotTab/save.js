@@ -99,7 +99,7 @@ function updateAttributes(content, attributes) {
           break;
         case "link":
           content.update({
-            [name]: (content.get(name) || new Scrivito.Link({ url: "/" })).copy(
+            [name]: (content.get(name) || new Scrivito.Link({ url: "#" })).copy(
               {
                 title: value,
               }
