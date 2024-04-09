@@ -8,8 +8,8 @@ export function parseHtml(html) {
 }
 
 function partToWidget(part) {
-  const html = part.replace(/^[^<]*>/, "");
-  const result = { objClass: "TextWidget", id: null };
+  const html = part.replace(/^[^<]*>/, "").replace(/(<\/)?script/g, "$1pre");
+  const result = { objClass: "TextWidget", id: null, _innerHtml: html };
 
   const hasWidgetData = html !== part;
   if (hasWidgetData) {
@@ -37,7 +37,7 @@ function partToWidget(part) {
   }
 
   if (result.objClass.startsWith("Text")) {
-    result.text = html.replace(/(<\/)?script/g, "$1pre");
+    result.text = html;
   }
 
   return result;

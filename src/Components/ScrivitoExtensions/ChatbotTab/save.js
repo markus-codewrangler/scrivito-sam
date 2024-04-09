@@ -2,6 +2,7 @@ import * as Scrivito from "scrivito";
 
 import { flatWidgets } from "./flatWidgets";
 import { widgetlistAttributeNames } from "./widgetlistAttributeNames.js";
+import { getPrimaryAttributeName } from "./getPrimaryAttributeName.js";
 
 export function canBeSaved(obj, widgetsDescription) {
   return !!toScrivitoWidgets(obj, widgetsDescription);
@@ -72,14 +73,23 @@ function containerAttributeName(widget) {
 }
 
 function updateAttributes(content, attributes) {
-  Object.entries(attributes).forEach(([key, value]) => {
+  const primaryAttributeName = getPrimaryAttributeName(content);
+  Object.entries(attributes).forEach(([key, rawValue]) => {
+    const name =
+      key === "_innerHtml" ? primaryAttributeName : key.replace("-title", "");
+    if (!name) return;
+    const definition = content.attributeDefinitions()[name];
+    if (!definition) {
+      console.error(`Unknown attribute ${content.objClass()}#${key}`);
+      return;
+    }
+
+    const [attributeType] = definition;
+
+    const needsCleanup = key === "_innerHtml" && attributeType !== "html";
+    const value = needsCleanup ? cleanUp(rawValue, attributeType) : rawValue;
+
     try {
-      const name = key.replace("-title", "");
-      const definition = content.attributeDefinitions()[name];
-      if (!definition) {
-        throw new Error(`Unknown attribute ${content.objClass()}#${key}`);
-      }
-      const [attributeType] = definition;
       switch (attributeType) {
         case "enum":
           content.update({ [name]: value || null });
@@ -108,6 +118,10 @@ function updateAttributes(content, attributes) {
       console.error(e);
     }
   });
+}
+
+function cleanUp(rawValue, attributeType) {
+  return rawValue.replace(/^\s*<\w+>|<\/\w+>\s*$/g, "").trim();
 }
 
 function toScrivitoWidgets(obj, widgetsDescription) {

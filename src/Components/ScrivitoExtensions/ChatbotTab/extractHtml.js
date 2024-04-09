@@ -1,5 +1,6 @@
 import * as Scrivito from "scrivito";
 import { flatWidgets } from "./flatWidgets.js";
+import { getPrimaryAttributeName } from "./getPrimaryAttributeName.js";
 
 export async function extractHtml(obj) {
   return Scrivito.load(() => {
@@ -7,9 +8,12 @@ export async function extractHtml(obj) {
     const html = widgets
       .map((w) => {
         const widgetClass = w.objClass();
-        const inner = w.get("headline") || w.get("text") || "";
+        const primaryAttributeName = getPrimaryAttributeName(w);
+        const inner = primaryAttributeName
+          ? getStringValue(w, primaryAttributeName)
+          : "";
         const tag = widgetClass.startsWith("Headline") ? w.get("style") : "";
-        return `  <widget ${getAttributesHtml(w)}>${
+        return `  <widget ${getAttributesHtml(w, primaryAttributeName)}>${
           tag ? `<${tag}>` : ""
         }${inner}${tag ? `</${tag}>` : ""}</widget>`;
       })
@@ -18,29 +22,29 @@ export async function extractHtml(obj) {
   });
 }
 
-function getAttributesHtml(content) {
+function getAttributesHtml(content, excludedAttributeName) {
   const attributes = { id: content.id(), type: content.objClass() };
 
   Object.entries(content.attributeDefinitions()).forEach(
     ([attributeName, [attributeType]]) => {
-      if ("link" === attributeType) {
-        attributes[`data-${attributeName}-title`] =
-          content.get(attributeName)?.title() || "";
-      }
+      if (attributeName === excludedAttributeName) return;
       if (
         [
           "boolean",
           "enum",
           "float",
           "integer",
+          "link",
           "multienum",
           "string",
           "stringlist",
         ].includes(attributeType)
       ) {
-        attributes[`data-${attributeName}`] = []
-          .concat(content.get(attributeName) ?? "")
-          .join(" ");
+        attributes[
+          "link" === attributeType
+            ? `data-${attributeName}-title`
+            : `data-${attributeName}`
+        ] = getStringValue(content, attributeName);
       }
     }
   );
@@ -48,4 +52,11 @@ function getAttributesHtml(content) {
   return Object.entries(attributes)
     .map(([k, v]) => `${k}="${v}"`)
     .join(" ");
+}
+
+function getStringValue(content, attributeName) {
+  const value = content.get(attributeName) ?? "";
+  if (Array.isArray(value)) return value.join(" ");
+  if (value instanceof Scrivito.Link) return value.title() || "";
+  return value.toString();
 }
