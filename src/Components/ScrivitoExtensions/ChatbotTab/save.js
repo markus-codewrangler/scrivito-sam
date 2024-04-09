@@ -91,6 +91,9 @@ function updateAttributes(content, attributes) {
 
     try {
       switch (attributeType) {
+        case "boolean":
+          content.update({ [name]: ["true", "yes"].includes(value) });
+          break;
         case "enum":
           content.update({ [name]: value || null });
           break;
