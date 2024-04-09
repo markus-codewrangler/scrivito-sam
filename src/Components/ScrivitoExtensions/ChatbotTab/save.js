@@ -112,7 +112,10 @@ function updateAttributes(content, attributes) {
           break;
         case "multienum":
         case "stringlist":
-          content.update({ [name]: value.split(/,? /).filter((v) => !!v) });
+          let splitter = " ";
+          if (value.includes(", ")) splitter = ", ";
+          if (value.includes("; ")) splitter = "; ";
+          content.update({ [name]: value.split(splitter).filter((v) => !!v) });
           break;
         default:
           content.update({ [name]: value });

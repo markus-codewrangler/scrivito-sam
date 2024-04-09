@@ -56,7 +56,12 @@ function getAttributesHtml(content, excludedAttributeName) {
 
 function getStringValue(content, attributeName) {
   const value = content.get(attributeName) ?? "";
-  if (Array.isArray(value)) return value.join(" ");
+  if (Array.isArray(value)) {
+    let joiner = " ";
+    if (value.some((v) => v.includes(" "))) joiner = ", ";
+    if (value.some((v) => v.includes(","))) joiner = "; ";
+    return value.length === 1 ? [value, ""].join(joiner) : value.join(joiner);
+  }
   if (value instanceof Scrivito.Link) return value.title() || "";
   return value.toString();
 }
