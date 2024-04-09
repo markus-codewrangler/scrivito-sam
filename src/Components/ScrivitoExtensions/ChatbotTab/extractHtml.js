@@ -12,7 +12,10 @@ export async function extractHtml(obj) {
         const inner = primaryAttributeName
           ? getStringValue(w, primaryAttributeName)
           : "";
-        const tag = widgetClass.startsWith("Headline") ? w.get("style") : "";
+        const tag =
+          widgetClass.startsWith("Headline") && w.get("style")?.length === 2
+            ? w.get("style")
+            : "";
         return `  <widget ${getAttributesHtml(w, primaryAttributeName)}>${
           tag ? `<${tag}>` : ""
         }${inner}${tag ? `</${tag}>` : ""}</widget>`;
