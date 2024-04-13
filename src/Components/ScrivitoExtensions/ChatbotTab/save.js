@@ -98,13 +98,13 @@ function updateAttributes(content, attributes) {
           content.update({ [name]: value || null });
           break;
         case "link":
-          content.update({
-            [name]: (content.get(name) || new Scrivito.Link({ url: "#" })).copy(
-              {
-                title: value,
-              }
-            ),
-          });
+          const link = content.get(name);
+          const fallback = new Scrivito.Link({ url: "#" });
+          if (link || value) {
+            content.update({
+              [name]: (link || fallback).copy({ title: value }),
+            });
+          }
           break;
         case "float":
         case "integer":
