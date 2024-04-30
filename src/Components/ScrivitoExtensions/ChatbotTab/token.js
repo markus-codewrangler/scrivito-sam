@@ -5,6 +5,7 @@ let token;
 export async function refreshToken() {
   // @ts-ignore
   window.tenantId =
+    Scrivito.getInstanceId?.() ||
     // @ts-ignore
     typeof import.meta.env === "undefined"
       ? // @ts-ignore
