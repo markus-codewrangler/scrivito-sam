@@ -4,14 +4,7 @@ let token;
 
 export async function refreshToken() {
   // @ts-ignore
-  window.tenantId =
-    Scrivito.getInstanceId?.() ||
-    // @ts-ignore
-    typeof import.meta.env === "undefined"
-      ? // @ts-ignore
-        process.env.SCRIVITO_TENANT
-      : // @ts-ignore
-        import.meta.env.SCRIVITO_TENANT;
+  window.tenantId = Scrivito.getInstanceId?.() || getEnvInstanceId();
 
   token = await Scrivito.load(() =>
     // @ts-ignore
@@ -19,6 +12,15 @@ export async function refreshToken() {
   );
 
   return !!token;
+}
+
+function getEnvInstanceId() {
+  // @ts-ignore
+  return typeof import.meta.env === "undefined"
+    ? // @ts-ignore
+      process.env.SCRIVITO_TENANT
+    : // @ts-ignore
+      import.meta.env.SCRIVITO_TENANT;
 }
 
 export function getToken() {
