@@ -1,5 +1,4 @@
 .assist-wrapper {
-  font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
   font-size: 13px;
   line-height: 19px;
   padding: 3px 7px;
@@ -133,7 +132,7 @@
     background-color: transparent;
     border-color: rgba(255, 255, 255, 0);
     &:hover {
-      background-color: #4a72aa;
+      background-color: #426698;
       border-color: rgba(255, 255, 255, 0.75);
     }
     &:focus {
@@ -212,7 +211,7 @@ i.icon {
   .prompt-wrapper {
     margin-bottom: 0.2px;
     textarea {
-      background: #666;
+      background: rgba(222, 222, 222, 0.2);
       color: #fff;
 
       &::placeholder {
@@ -221,6 +220,6 @@ i.icon {
     }
   }
 
-  background: #3f3f3f;
+  background: #1d2229;
   color: #eee;
 }
