@@ -1,5 +1,6 @@
 export const languages = {
   de: {
+    accept: "Übernehmen",
     abortResponse: "Abbrechen",
     language: "German",
     placeholder: "Ihre Nachricht",
@@ -8,6 +9,7 @@ export const languages = {
     send: "Absenden",
   },
   en: {
+    accept: "Accept",
     abortResponse: "Stop",
     language: "English",
     placeholder: "Your message",
@@ -16,6 +18,7 @@ export const languages = {
     send: "Send",
   },
   fr: {
+    accept: "Accepter",
     abortResponse: "Arrêter",
     language: "French",
     placeholder: "Votre message",

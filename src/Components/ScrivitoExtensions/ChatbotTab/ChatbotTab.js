@@ -153,6 +153,7 @@ const Assist = Scrivito.connect(function ({ obj, editor, locale }) {
                     content={msg.content}
                     obj={obj}
                     loading={loading}
+                    language={language}
                   />
                 </div>
               </div>
@@ -217,7 +218,7 @@ const SPLIT =
   /<\/html>\s*```|```html\n<html[^<>]*>?|<\/html>|<html[^<>]*>?|```[a-z]*/;
 
 // @ts-ignore
-const Content = React.memo(({ content, obj, loading }) => {
+const Content = React.memo(({ content, obj, language, loading }) => {
   if (!loading) console.log(content);
 
   let preprocessedContent = content;
@@ -250,7 +251,11 @@ const Content = React.memo(({ content, obj, loading }) => {
           )
         )}
         {canBeSaved(obj, widgetsDescription) && (
-          <AcceptButton widgetsDescription={widgetsDescription} obj={obj} />
+          <AcceptButton
+            widgetsDescription={widgetsDescription}
+            obj={obj}
+            title={language.accept}
+          />
         )}
       </section>
     );
@@ -260,10 +265,11 @@ const Content = React.memo(({ content, obj, loading }) => {
 const AcceptButton = Scrivito.connect(function AcceptButton({
   obj,
   widgetsDescription,
+  title,
 }) {
   return (
     <button
-      title="Übernehmen"
+      title={title}
       className="btn accept"
       onClick={() => save(obj, widgetsDescription)}
     >
