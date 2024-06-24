@@ -3,18 +3,18 @@ import "./ChatbotTab.scss";
 import * as React from "react";
 import * as Scrivito from "scrivito";
 
-import { useChatCompletion } from "openai-streaming-hooks-chrome-fix";
 import TextareaAutosize from "react-textarea-autosize";
 import { throttle } from "lodash-es";
 
+import { instanceId } from "./instanceId.js";
 import { languages } from "./languages.js";
-import { getToken, refreshToken } from "./token.js";
 import { extractHtml } from "./extractHtml.js";
 import { parseHtml } from "./parseHtml.js";
 import { getModel } from "./model.js";
 import { prompts } from "./prompts.js";
 import { getWidgetsPrompt } from "./getWidgetsPrompt.js";
 import { canBeSaved, save } from "./save.js";
+import { useChatCompletion } from "./useChatCompletion.js";
 
 export function ChatbotTab({ obj }) {
   const uiContext = Scrivito.uiContext();
@@ -35,13 +35,12 @@ export function ChatbotTab({ obj }) {
 
 const Assist = Scrivito.connect(function ({ obj, editor, locale }) {
   const [systemHtml, setSystemHtml] = React.useState("");
-  const [hasToken, setHasToken] = React.useState(false);
   const [prompt, setPrompt] = React.useState("");
   const [autoSubmit, setAutoSubmit] = React.useState(false);
 
-  React.useEffect(() => {
-    refreshToken().then(setHasToken);
-  }, []);
+  // @ts-ignore
+  const token = Scrivito.currentEditor()?.authToken();
+  const hasToken = !!token;
 
   const {
     messages,
@@ -51,11 +50,10 @@ const Assist = Scrivito.connect(function ({ obj, editor, locale }) {
     resetMessages,
     setMessages,
   } = useChatCompletion({
-    // @ts-ignore
     model: getModel(),
-    // @ts-ignore
-    apiKey: getToken,
+    apiKey: token,
     user: editor.id(),
+    instanceId: instanceId(),
   });
 
   React.useEffect(() => {
@@ -90,7 +88,6 @@ const Assist = Scrivito.connect(function ({ obj, editor, locale }) {
       });
     }
     submit.push({ content: prompt, role: "user" });
-    setHasToken(await refreshToken());
     // @ts-ignore
     submitPrompt(submit);
     setPrompt("");
@@ -112,10 +109,7 @@ const Assist = Scrivito.connect(function ({ obj, editor, locale }) {
     }
   }, [messages, autoSubmit, onSend]);
 
-  const isDisabled =
-    !hasToken ||
-    loading ||
-    (messages.length > 0 && messages[messages.length - 1].meta.loading);
+  const isDisabled = !instanceId() || !hasToken || loading;
 
   return (
     <>

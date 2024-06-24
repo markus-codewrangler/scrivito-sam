@@ -2,16 +2,13 @@
   "name": "scrivito-sam",
   "dependencies": {
     "lodash-es": "^4.17.21",
-    "openai-streaming-hooks-chrome-fix": "^3.1.0",
+    "openai": "^4.52.0",
     "react-textarea-autosize": "^8.5.2"
   },
   "main": "src/index.js",
   "peerDependencies": {
     "react": "*",
     "scrivito": "*"
-  },
-  "scripts": {
-    "postinstall": "sed -i.bak 's#CHAT_COMPLETIONS_URL,#`https://i7ukqy3mhy3nzkn3dutmmzdx440xgtjk.lambda-url.eu-west-1.on.aws/?tenant_id=${window.tenantId}`,#;s#{apiKey}#{apiKey()}#;s#\\^data#\\^\\\\n?data#' `find . ../.. -maxdepth 2 -name openai-streaming-hooks-chrome-fix -print -quit`/dist/chat-stream-handler.js"
   },
   "type": "module"
 }
