@@ -1,4 +1,4 @@
-import { ChatbotTab } from "./Components/ScrivitoExtensions/ChatbotTab/ChatbotTab.js";
+import { ChatbotTab } from "./Components/ScrivitoExtensions/ChatbotTab/ChatbotTab.jsx";
 
 export const assistPopertiesGroup = {
   title: "Assistant Sam",
