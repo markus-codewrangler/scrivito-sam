@@ -15,7 +15,7 @@ import { prompts } from "./prompts.js";
 import { getWidgetsPrompt } from "./getWidgetsPrompt.js";
 import { canBeSaved, save } from "./save.js";
 import { useChatCompletion } from "../useChatCompletion.js";
-import { ModelChooser } from "../ModelChooser.js";
+import { ModelChooser } from "../ModelChooser.jsx";
 import { parseMessage } from "./parseMessage.js";
 
 export function ChatbotTab({ obj }) {

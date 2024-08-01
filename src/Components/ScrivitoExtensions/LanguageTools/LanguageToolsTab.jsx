@@ -10,8 +10,8 @@ import { getModel } from "../model.js";
 import { updateObj } from "./updateObj.js";
 import { actions, prompts } from "./prompts.js";
 import { extract, getWidgetsAsArray } from "./extractContent.js";
-import { ModelChooser } from "../ModelChooser.js";
-import { ConfigDialog } from "./ConfigDialog.js";
+import { ModelChooser } from "../ModelChooser.jsx";
+import { ConfigDialog } from "./ConfigDialog.jsx";
 
 const turndownService = new TurndownService();
 
