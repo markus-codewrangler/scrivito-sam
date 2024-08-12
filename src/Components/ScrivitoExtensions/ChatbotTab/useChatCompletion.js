@@ -92,7 +92,8 @@ async function startStreaming({
 
   return stream.finalChatCompletion().then(({ choices }) => {
     setCompletionMessage(null);
-    setMessages(messages.concat(choices[0].message));
+    const { tool_calls, ...rest } = choices[0].message;
+    setMessages(messages.concat({ ...rest }));
     setLoading(false);
   });
 }
