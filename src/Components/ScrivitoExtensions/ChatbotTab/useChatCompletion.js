@@ -73,6 +73,7 @@ async function startStreaming({
       return fetch(url, {
         ...init,
         headers: cleanHeaders(init?.headers),
+        body: JSON.stringify(JSON.parse(init?.body)),
       });
     },
   });
