@@ -85,6 +85,10 @@ async function startStreaming({
     user,
   });
 
+  stream.on("error", () => {
+    setLoading(false);
+  });
+
   stream.on("content", () => {
     const message = stream.currentChatCompletionSnapshot?.choices[0].message;
     if (message) setCompletionMessage({ ...message });
