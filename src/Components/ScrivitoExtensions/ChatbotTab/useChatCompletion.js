@@ -71,8 +71,8 @@ async function startStreaming({
     dangerouslyAllowBrowser: true,
     fetch: async (url, init) => {
       const headers = cleanHeaders(init?.headers);
-      const body = init?.body?.toString();
-      if (body !== undefined) headers["Content-Length"] = body.length;
+      const body = JSON.stringify(JSON.parse(init?.body?.toString() || ""));
+      headers["Content-Length"] = body.length;
       return fetch(url, { ...init, body, headers });
     },
   });
