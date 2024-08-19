@@ -69,12 +69,8 @@ async function startStreaming({
     defaultQuery: { tenant_id: instanceId },
     defaultHeaders: { Accept: "*/*" },
     dangerouslyAllowBrowser: true,
-    fetch: async (url, init) => {
-      const headers = cleanHeaders(init?.headers);
-      const body = JSON.stringify(JSON.parse(init?.body?.toString() || ""));
-      headers["Content-Length"] = body.length;
-      return fetch(url, { ...init, body, headers });
-    },
+    fetch: async (url, init) =>
+      fetch(url, { ...init, headers: cleanHeaders(init?.headers) }),
   });
 
   const stream = await client.beta.chat.completions.stream({
