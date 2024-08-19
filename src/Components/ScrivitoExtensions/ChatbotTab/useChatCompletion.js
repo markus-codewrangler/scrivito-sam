@@ -43,11 +43,11 @@ export function useChatCompletion({ apiKey, instanceId, model, user }) {
 }
 
 let OPENAI_API_KEY;
-if (typeof process.env.OPENAI_API_KEY !== "undefined") {
+if (typeof process.env !== "undefined") {
   OPENAI_API_KEY = process.env.OPENAI_API_KEY;
 }
 // @ts-ignore
-if (typeof import.meta.env.OPENAI_API_KEY !== "undefined") {
+if (typeof import.meta.env !== "undefined") {
   // @ts-ignore
   OPENAI_API_KEY = import.meta.env.OPENAI_API_KEY;
 }
