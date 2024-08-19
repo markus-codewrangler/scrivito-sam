@@ -70,10 +70,10 @@ async function startStreaming({
     defaultHeaders: { Accept: "*/*" },
     dangerouslyAllowBrowser: true,
     fetch: async (url, init) => {
-      return fetch(url, {
-        ...init,
-        headers: cleanHeaders(init?.headers),
-      });
+      const headers = cleanHeaders(init?.headers);
+      const body = init?.body?.toString();
+      if (body !== undefined) headers["Content-Length"] = body.length;
+      return fetch(url, { ...init, body, headers });
     },
   });
 
@@ -104,10 +104,10 @@ async function startStreaming({
 function cleanHeaders(headers = {}) {
   return Object.fromEntries(
     Object.entries(headers)
-      // content-length may be wrong if the body is treated as JSON in middleware
-      .filter(([k]) => !k.startsWith("x-") && k !== "content-length")
+      .filter(([k]) => !k.startsWith("x-"))
       .map(([k, v]) => [
         k
+          .replace("content-length", "Content-Length")
           .replace("content-type", "Content-Type")
           .replace("authorization", "Authorization")
           .replace("accept", "Accept"),
