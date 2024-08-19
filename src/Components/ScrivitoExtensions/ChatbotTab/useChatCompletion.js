@@ -73,7 +73,6 @@ async function startStreaming({
       return fetch(url, {
         ...init,
         headers: cleanHeaders(init?.headers),
-        body: JSON.stringify(JSON.parse(init?.body)),
       });
     },
   });
@@ -105,7 +104,8 @@ async function startStreaming({
 function cleanHeaders(headers = {}) {
   return Object.fromEntries(
     Object.entries(headers)
-      .filter(([k]) => !k.startsWith("x-"))
+      // content-length may be wrong if the body is treated as JSON in middleware
+      .filter(([k]) => !k.startsWith("x-") && k !== "content-length")
       .map(([k, v]) => [
         k
           .replace("content-type", "Content-Type")
