@@ -42,13 +42,15 @@ export function useChatCompletion({ apiKey, instanceId, model, user }) {
   };
 }
 
-let OPENAI_API_KEY =
+let OPENAI_API_KEY;
+if (typeof process.env.OPENAI_API_KEY !== "undefined") {
+  OPENAI_API_KEY = process.env.OPENAI_API_KEY;
+}
+// @ts-ignore
+if (typeof import.meta.env.OPENAI_API_KEY !== "undefined") {
   // @ts-ignore
-  typeof import.meta.env === "undefined"
-    ? // @ts-ignore
-      process.env.OPENAI_API_KEY
-    : // @ts-ignore
-      import.meta.env.OPENAI_API_KEY;
+  OPENAI_API_KEY = import.meta.env.OPENAI_API_KEY;
+}
 
 async function startStreaming({
   apiKey,
