@@ -87,16 +87,13 @@ async function startStreaming({
     return;
   }
 
-  const message = {
-    content: "",
-    role: "assistant",
-  };
+  const message = {};
 
   for await (const chunk of stream) {
-    const content = chunk.choices[0]?.delta?.content;
-
+    const { content, role } = chunk.choices[0].delta;
+    if (role) message.role = role;
     if (content) {
-      message.content += content;
+      message.content = [message.content, content].join("");
       setCompletionMessage({ ...message });
     }
   }
