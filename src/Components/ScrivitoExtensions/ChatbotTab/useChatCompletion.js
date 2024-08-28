@@ -69,47 +69,39 @@ async function startStreaming({
       : "https://e7iuggnyr4t2grfrffawjd2q5a0mdcgh.lambda-url.eu-central-1.on.aws/v1",
 
     defaultQuery: { tenant_id: instanceId },
-    defaultHeaders: { Accept: "*/*" },
     dangerouslyAllowBrowser: true,
-    fetch: async (url, init) =>
-      fetch(url, { ...init, headers: cleanHeaders(init?.headers) }),
   });
 
-  const stream = await client.beta.chat.completions.stream({
-    model,
-    messages,
-    stream: true,
-    user,
-  });
+  let stream;
 
-  stream.on("error", () => {
+  try {
+    stream = await client.chat.completions.create({
+      model,
+      messages,
+      stream: true,
+      user,
+    });
+  } catch (error) {
+    console.error(error);
     setLoading(false);
-  });
+    return;
+  }
 
-  stream.on("content", () => {
-    const message = stream.currentChatCompletionSnapshot?.choices[0].message;
-    if (message) setCompletionMessage({ ...message });
-  });
+  const message = {
+    content: "",
+    role: "assistant",
+  };
 
-  return stream.finalChatCompletion().then(({ choices }) => {
-    setCompletionMessage(null);
-    const { tool_calls, ...otherMessageAttributes } = choices[0].message;
-    setMessages(messages.concat({ ...otherMessageAttributes }));
-    setLoading(false);
-  });
-}
+  for await (const chunk of stream) {
+    const content = chunk.choices[0]?.delta?.content;
 
-function cleanHeaders(headers = {}) {
-  return Object.fromEntries(
-    Object.entries(headers)
-      .filter(([k]) => !k.startsWith("x-"))
-      .map(([k, v]) => [
-        k
-          .replace("content-length", "Content-Length")
-          .replace("content-type", "Content-Type")
-          .replace("authorization", "Authorization")
-          .replace("accept", "Accept"),
-        v,
-      ])
-  );
+    if (content) {
+      message.content += content;
+      setCompletionMessage({ ...message });
+    }
+  }
+
+  setCompletionMessage(null);
+  setMessages(messages.concat({ ...message }));
+  setLoading(false);
 }
