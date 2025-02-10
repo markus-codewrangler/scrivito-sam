@@ -1,5 +1,6 @@
 import OpenAI from "openai";
 import { useMemo, useState } from "react";
+import { requestData } from "./data";
 
 export function useChatCompletion({ apiKey, instanceId, model, user }) {
   const [messages, setMessages] = useState([]);
@@ -74,34 +75,7 @@ async function startStreaming({
 
   try {
     const runner = client.beta.chat.completions
-      .runTools({
-        stream: true,
-        model: "aws/anthropic.claude-3-5-sonnet-20240620-v1:0", // "gpt-4o", //
-        messages: [{ role: "user", content: "How is the weather this week?" }],
-        tools: [
-          {
-            type: "function",
-            function: {
-              function: getCurrentLocation,
-              description: "get the current location",
-            },
-          },
-          {
-            type: "function",
-            function: {
-              function: getWeather,
-              parse: JSON.parse,
-              parameters: {
-                type: "object",
-                properties: {
-                  location: { type: "string" },
-                },
-              },
-              description: "get weather for location",
-            },
-          },
-        ],
-      })
+      .runTools(requestData)
       .on("message", (message) => console.log("message:", message));
 
     const finalContent = await runner.finalContent();
