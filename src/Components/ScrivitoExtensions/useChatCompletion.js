@@ -1,5 +1,6 @@
 import OpenAI from "openai";
 import { useMemo, useState } from "react";
+import { requestData } from "./ChatbotTab/data";
 
 export function useChatCompletion({ getApiKey, instanceId, model, user }) {
   const [messages, setMessages] = useState([]);
@@ -67,14 +68,22 @@ async function startStreaming({
   let message = null;
   let finishReason;
 
+  // genai-service - $LATEST: https://zvsk3xf4tjzsfmypkyczd24gpq0hmfds.lambda-url.eu-central-1.on.aws/v1
+  // genai-service - active: https://lhkrr3a4vxmag37o5voius7jbi0wcvie.lambda-url.eu-central-1.on.aws/v1
+  // test API Gateway: https://97uhfswdhd.execute-api.eu-central-1.amazonaws.com/gen-ai/v1
+  // genai-service-dev - stable: https://3ztb7l4rouk5qzb2ftjvjjjzoi0mmvow.lambda-url.eu-central-1.on.aws/v1
+  // genai-service-dev - $LATEST: https://p62etaa3urpzbpupglmwl6ytfa0pkwwk.lambda-url.eu-central-1.on.aws/v1
+  // openAiApiProxy (ip-saas-dev): https://e7iuggnyr4t2grfrffawjd2q5a0mdcgh.lambda-url.eu-central-1.on.aws/v1
+  // http://localhost:3000/v1
+
   do {
     const client = new OpenAI({
       apiKey: OPENAI_API_KEY || (await getApiKey?.()),
       baseURL: OPENAI_API_KEY
         ? "https://api.openai.com/v1"
-        : "https://e7iuggnyr4t2grfrffawjd2q5a0mdcgh.lambda-url.eu-central-1.on.aws/v1",
+        : "http://localhost:3000/v1",
 
-      defaultQuery: { tenant_id: instanceId },
+      defaultQuery: { instance_id: instanceId },
       dangerouslyAllowBrowser: true,
     });
 
@@ -82,12 +91,7 @@ async function startStreaming({
     let stream;
 
     try {
-      stream = await client.chat.completions.create({
-        model,
-        messages: message ? messages.concat(message) : messages,
-        stream: true,
-        user,
-      });
+      stream = await client.beta.chat.completions.runTools(requestData);
     } catch (error) {
       setCompletionMessage(null);
       setMessages(
